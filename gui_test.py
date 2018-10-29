@@ -14,13 +14,13 @@ info_list =	 (	"Plant Id",
 				"Plant State")
 
 action_colors = {	"Pot Info" :		("#000", "#222", "#fff"),
-					"Into Soil" : 		("#d00", "#f00", "#fff"),
-					"Into Greenhouse" : ("#d80", "#fa0", "#000"),
-					"Into Pots" : 		("#dd0", "#ff0", "#000"),
-					"Begin Flowering" : ("#0d0", "#0f0", "#000"),
-					"End Flowering" : 	("#0dd", "#0ff", "#000"),
-					"End Maturation" : 	("#04d", "#06f", "#fff"),
-					"Harvested" : 		("#90f", "#b0f", "#fff")}
+					"Into Soil" : 		("#050", "#272", "#fff"),
+					"Into Greenhouse" : ("#070", "#292", "#000"),
+					"Into Pots" : 		("#0a0", "#2c2", "#000"),
+					"Begin Flowering" : ("#0d0", "#2f2", "#000"),
+					"End Flowering" : 	("#8d0", "#af2", "#000"),
+					"End Maturation" : 	("#ad0", "#cf2", "#000"),
+					"Harvested" : 		("#dd0", "#ff2", "#000")}
 
 actions_in_order = ["Pot Info", "Into Soil", "Into Greenhouse", "Into Pots", "Begin Flowering", "End Flowering", "End Maturation", "Harvested"]
 data_folder = "Tub_data"
@@ -111,7 +111,7 @@ class Program():
 			self.action_button[i].configure(indicatoron 		= 0,
 											background 			= action_colors[action][0], 
 											activebackground 	= action_colors[action][1],
-											highlightcolor		= "black", 
+											selectcolor			= action_colors[action][1], 
 											foreground 			= action_colors[action][2], 
 											activeforeground 	= action_colors[action][2], 
 											width 				= self.button_width*2, 
@@ -167,8 +167,8 @@ class Program():
 			os.remove("Tub_data/temp_tub.csv")
 			return
 
-		os.remove(filename)
-		os.rename("Tub_data/temp_tub.csv", filename)
+		os.remove(file_path)
+		os.rename("Tub_data/temp_tub.csv", file_path)
 		self.pot_text[i].set(new_name)
 		self.pot_list[i].configure(	background = state_colors[0], 
 									activebackground = state_colors[1], 
@@ -222,6 +222,7 @@ class Program():
 				self.action_state.set(info_list[latest_date_index])
 				self.setPot(pot_number)
 				#rint(self.pot_text[pot_number].get())
+		self.action_state.set(info_list[0])
 		return
 
 def main():

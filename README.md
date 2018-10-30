@@ -1,4 +1,4 @@
 # greenhouse-management
 manage data collection for plants in the greenhouse
 
-testing, did it work? I don't know... YAS, IT WORKED
+Creates a gui that is capable of tracking the plant information and growth state in the tubs and pots of the greenhouse.

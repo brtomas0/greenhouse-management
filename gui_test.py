@@ -58,7 +58,7 @@ class Program():
 		self.button_height = 3
 
 		self.buttonInitilize()
-		self.resetTub()
+		self.importFile()
 
 	def buttonInitilize(self):
 		self.current_state_label = tk.Label(self.frame, textvariable = self.action_state)

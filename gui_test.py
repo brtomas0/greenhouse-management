@@ -89,11 +89,8 @@ class Program():
 		self.label_font = font.Font(size = 12)
 
 		self.buttonInitilize()
-<<<<<<< HEAD
 		self.importTub()
-=======
-		self.importFile()
->>>>>>> 4f521fedcbce8e1fdb5ba28a517ee36e68bdb095
+
 
 	def buttonInitilize(self):
 		self.current_state_label = tk.Label(self.frame, textvariable = self.action_state, font = self.label_font)
@@ -260,7 +257,7 @@ class Program():
 				self.pot_text[pot_number].set("%s\nPot %02d\n%s"%(name, pot_number + 1, latest_date))
 				self.action_state.set(info_list[latest_date_index])
 				self.setPot(pot_number)
-				#rint(self.pot_text[pot_number].get())
+				#print(self.pot_text[pot_number].get())
 		self.action_state.set(info_list[0])
 		return
 

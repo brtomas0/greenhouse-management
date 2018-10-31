@@ -89,7 +89,11 @@ class Program():
 		self.label_font = font.Font(size = 12)
 
 		self.buttonInitilize()
+<<<<<<< HEAD
 		self.importTub()
+=======
+		self.importFile()
+>>>>>>> 4f521fedcbce8e1fdb5ba28a517ee36e68bdb095
 
 	def buttonInitilize(self):
 		self.current_state_label = tk.Label(self.frame, textvariable = self.action_state, font = self.label_font)

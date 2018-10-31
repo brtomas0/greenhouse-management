@@ -16,13 +16,13 @@ info_list =	 (	"Plant Id",
 				"Plant State")
 
 action_colors = {	"Pot Info" :		("#000", "#222", "#fff"),
-					"Into Soil" : 		("#050", "#272", "#fff"),
-					"Into Greenhouse" : ("#070", "#292", "#fff"),
-					"Into Pots" : 		("#0a0", "#2c2", "#000"),
-					"Begin Flowering" : ("#0d0", "#2f2", "#000"),
-					"End Flowering" : 	("#8d0", "#af2", "#000"),
-					"End Maturation" : 	("#ad0", "#cf2", "#000"),
-					"Harvested" : 		("#dd0", "#ff2", "#000")}
+					"Into Soil" : 		("#751", "#272", "#fff"),
+					"Into Greenhouse" : ("#050", "#292", "#fff"),
+					"Into Pots" : 		("#080", "#2c2", "#000"),
+					"Begin Flowering" : ("#0c0", "#2f2", "#000"),
+					"End Flowering" : 	("#9d0", "#af2", "#000"),
+					"End Maturation" : 	("#dd0", "#cf2", "#000"),
+					"Harvested" : 		("#aa0", "#ff2", "#000")}
 
 actions_in_order = ["Pot Info", "Into Soil", "Into Greenhouse", "Into Pots", "Begin Flowering", "End Flowering", "End Maturation", "Harvested"]
 export_filename = "Greenhouse_Summary.csv"
@@ -83,8 +83,8 @@ class Program():
 		self.tub_columns = 10
 		self.app_rows = 8
 		self.app_columns = 12
-		self.button_width = 18
-		self.button_height = 4
+		self.button_width = 15
+		self.button_height = 3
 		self.pot_font = font.Font(size = 12)
 		self.label_font = font.Font(size = 12)
 

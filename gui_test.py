@@ -1,7 +1,16 @@
 import tkinter as tk
 from tkinter import font
 from tkinter import ttk
-import os, time
+import os
+import time
+import platform
+
+if platform.system() == "Windows":
+	file_separator = "\\"
+elif platform.system() == "Linux":
+	file_separator = "/"
+else:
+	raise Exception("System is not supported")
 
 todays_date = time.strftime("%x")
 info_list =	 (	"Plant Id",
@@ -16,13 +25,13 @@ info_list =	 (	"Plant Id",
 				"Plant State")
 
 action_colors = {	"Pot Info" :		("#000", "#222", "#fff"),
-					"Into Soil" : 		("#751", "#272", "#fff"),
-					"Into Greenhouse" : ("#050", "#292", "#fff"),
-					"Into Pots" : 		("#080", "#2c2", "#000"),
-					"Begin Flowering" : ("#0c0", "#2f2", "#000"),
-					"End Flowering" : 	("#9d0", "#af2", "#000"),
-					"End Maturation" : 	("#dd0", "#cf2", "#000"),
-					"Harvested" : 		("#aa0", "#ff2", "#000")}
+					"Into Soil" : 		("#751", "#862", "#fff"),
+					"Into Greenhouse" : ("#050", "#262", "#fff"),
+					"Into Pots" : 		("#080", "#292", "#000"),
+					"Begin Flowering" : ("#0c0", "#2d2", "#000"),
+					"End Flowering" : 	("#9d0", "#ae2", "#000"),
+					"End Maturation" : 	("#dd0", "#ee2", "#000"),
+					"Harvested" : 		("#aa0", "#bb2", "#000")}
 
 actions_in_order = ["Pot Info", "Into Soil", "Into Greenhouse", "Into Pots", "Begin Flowering", "End Flowering", "End Maturation", "Harvested"]
 export_filename = "Greenhouse_Summary.csv"
@@ -38,9 +47,11 @@ class ContinueQuestion():
 		self.button_font = font.Font(size = 48)
 
 		self.continue_button = tk.Button(self.frame, text = "Continue?", command = self.answerTrue, font = self.button_font, width = 24, height = 6)
-		self.continue_button.pack(side = "left")
+		self.continue_button.grid(row = 1, column = 0)
 		self.quit_button = tk.Button(self.frame, text = "Don't Continue", fg = "red", command = self.answerFalse, font = self.button_font, width = 24, height = 6)
-		self.quit_button.pack(side = "right")
+		self.quit_button.grid(row = 1, column = 1)
+		self.info_label = tk.Label(self.frame, text = "\nThis action will overright data that currently exists!\n", font = self.button_font)
+		self.info_label.grid(row = 0, columnspan = 2)
 
 		self.master.wait_window()
 
@@ -170,18 +181,24 @@ class Program():
 
 		is_data_updated = False
 
-		state_colors = action_colors[self.action_state.get()]
+		try:
+			state_colors = action_colors[self.action_state.get()]
+		except KeyError as e:
+			print("Could not set colors based on %s"%e)
+		finally:
+			return
+
 		new_name_list = self.pot_text[i].get().split("\n")
 		new_name = "\n".join((new_name_list[0], new_name_list[1], todays_date))
 
 		gh = self.greenhouse_variable.get()
 		tub = self.tub_variable.get()
 		filename =  "GH%01d%s-%s.csv"%(int(gh / 2) + 1, "E" * (gh % 2) + "W" * ((gh +1) % 2), tub + 1)
-		file_path = data_folder + "\\" + filename
+		filepath = data_folder + file_separator + filename
 		#print("Searching in " + filename)
 
 		temp_file = open("Tub_data/temp_tub.csv", "w")
-		with open(file_path, "r") as ifile:
+		with open(filepath, "r") as ifile:
 			for line in ifile:
 				if new_name_list[0] in line:
 					line_list = line.split(",")
@@ -202,8 +219,8 @@ class Program():
 			os.remove("Tub_data/temp_tub.csv")
 			return
 
-		os.remove(file_path)
-		os.rename("Tub_data/temp_tub.csv", file_path)
+		os.remove(filepath)
+		os.rename("Tub_data/temp_tub.csv", filepath)
 		self.pot_text[i].set(new_name)
 		self.pot_list[i].configure(	background = state_colors[0], 
 									activebackground = state_colors[1], 
@@ -221,12 +238,22 @@ class Program():
 									activeforeground = state_colors[2])
 
 	def resetTub(self):
-		for i in range(self.number_of_pots): 
-			self.pot_text[i].set("\nPot %02d\n"%(i+1))
-			self.pot_list[i].configure(	background = "SystemButtonFace", 
-										activebackground = "SystemButtonHighlight", 
-										foreground = "black", 
-										activeforeground = "black")
+		if platform.system() == "Windows":
+			for i in range(self.number_of_pots): 
+				self.pot_text[i].set("\nPot %02d\n"%(i+1))
+				self.pot_list[i].configure(	background = "SystemButtonFace", 
+											activebackground = "SystemButtonHighlight", 
+											foreground = "black", 
+											activeforeground = "black")
+		elif platform.system() == "Linux":
+			for i in range(self.number_of_pots): 
+				self.pot_text[i].set("\nPot %02d\n"%(i+1))
+				self.pot_list[i].configure(	background = "#d9d9d9", 
+											activebackground = "#ffffff", 
+											foreground = "black", 
+											activeforeground = "black")
+		else:
+			raise Exception("Operating system is not supported")
 
 	def updateAction(self, action):
 		self.action_state.set(action)
@@ -238,14 +265,14 @@ class Program():
 		#"%s\nPot %02d\n%s"%(self.plant_names[i].get(), i + 1, self.plant_dates[i].get())
 		self.resetTub()
 		filename =  "GH%01d%s-%s.csv"%(int(gh / 2) + 1, "E" * (gh % 2) + "W" * ((gh +1) % 2), tub + 1)
-		file_path = data_folder + "\\" + filename
+		filepath = data_folder + file_separator + filename
 		#print("importing " + filename)
 		
 		if filename not in os.listdir(data_folder):
 			print("File Does not exist in %s"%data_folder)
 			return
 
-		with open(file_path) as ifile:
+		with open(filepath) as ifile:
 			ifile.readline()
 			for line in ifile:
 				data_list = line.rstrip().split(",")
@@ -257,26 +284,36 @@ class Program():
 				self.action_state.set(info_list[latest_date_index])
 				self.setPot(pot_number)
 				#print(self.pot_text[pot_number].get())
-		self.action_state.set(info_list[0])
+		self.action_state.set(actions_in_order[0])
 		return
 
 	def exportMaster(self):
+		print("Export beginning to %s"%export_filename)
+
 		master_file = open(export_filename, "w")
 		titles = [info_list[0]] + ["Greenhouse","Tub Number"] + [i for i in info_list[1:]]
 		master_file.write(",".join(titles) + "\n")
-		for file in os.listdir(data_folder):
-			gh = self.greenhouse_variable.get()
-			gh_text = "GH%01d%s"%(int(gh / 2) + 1, "E" * (gh % 2) + "W" * ((gh +1) % 2))
-			tub_text = "%s"%(self.tub_variable.get() + 1)
 
-			with open(data_folder + "\\" + file) as tub_file:
+		for file in os.listdir(data_folder):
+			print(file[:file.index(".csv")])
+			try:
+				gh_text, tub_text = file[:file.index(".csv")].split("-")
+			except:
+				raise Exception("File: %s should not exist in the folder: %s"%(file, data_folder))
+
+			
+
+			with open(data_folder + file_separator + file) as tub_file:
 				tub_file.readline()
 				for line in tub_file:
 					split_line = line.split(",")
 					new_line = [split_line[0]] + [gh_text, tub_text] + [i for i in split_line[1:]]
 					#print(new_line)
 					master_file.write(",".join(new_line))
+
 		master_file.close()
+
+		print("Exporting finished")
 
 	def importMaster(self):
 		if import_filename not in os.listdir():
@@ -291,20 +328,43 @@ class Program():
 			print("Titles are not correct, should be:\n\n%s\n"%",".join(info_list))
 			return
 
+		modified_file_paths = []
 		if ContinueQuestion(tk.Tk()).getAnswer():
 			print("File import commencing from %s"%import_filename)
 			for line in ifile:
 				split_line = line.strip().split(",")
-				filename = "-".join(split_line[1:3])
-				print(filename)
+				filename = "-".join(split_line[1:3]) + ".csv"
+				filepath = data_folder + file_separator + filename
+				
+				if filepath not in modified_file_paths: #so that we don't have to later update all the files in the folder
+					modified_file_paths.append(filepath)
+
+				if filename not in os.listdir(data_folder):
+					with open(filepath, "w") as file:
+						file.write(",".join(info_list) + "\n")
+
+				newline = [split_line[0]] + split_line[3:] + ["\n"]
+				with open(filepath, "a") as file:
+					file.write(",".join(newline))
+			print("File import finished")
+
+		for file in modified_file_paths:
+			self.updateTubAppends(file)
 		# Need to merge the files, overwriting old data with new data
 
 		ifile.close()
 
-	def updateTubAppends(self, filename):
-		file = open(filename)
-		temp_pot_list = [None]*self.number_of_pots
-		file.close()
+	def updateTubAppends(self, filepath):
+		with open(filepath, "r") as file:
+			headline = file.readline()
+			temp_line_list = [None]*self.number_of_pots
+			for line in file:
+				temp_line_list[int(line.split(",")[1]) - 1] = line
+
+		with open(filepath,"w") as file:
+			file.write(headline)
+			for line in temp_line_list:
+				file.write(line)
 
 def main():
 	root = tk.Tk()

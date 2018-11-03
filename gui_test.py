@@ -302,6 +302,10 @@ class Program():
 
 		ifile.close()
 
+	def updateTubAppends(self, filename):
+		file = open(filename)
+
+		file.close()
 
 def main():
 	root = tk.Tk()

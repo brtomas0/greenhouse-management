@@ -77,14 +77,20 @@ class PlantNameInput():
 		self.text_label.grid(row = 0, column = 0)
 		self.data_entry = tk.Entry(self.frame)
 		self.data_entry.grid(row = 0, column = 1)
+		self.data_entry.focus()
 		self.entry_done = tk.Button(self.frame, text = "Done", command = self.buttonClick)
 		self.entry_done.grid(row = 0, column = 2)
+
+		self.master.bind("<Return>", self.pressEnter)
 	
 		self.master.wait_window()
 	
 	def buttonClick(self):
 		self.new_name = self.data_entry.get()
 		self.master.destroy()
+
+	def pressEnter(self, event):
+		self.buttonClick()
 
 	def getName(self):
 		return self.new_name
@@ -197,11 +203,11 @@ class Program():
 	def updateTub(self):
 		self.importTub()
 
-	def updatePot(self, i):
+	def updatePotOriginal(self, i):
 		#print("Pot Number is: %s"%(i+1))
 		if self.action_state.get() == "Pot Info":
-			new_name = PlantNameInput(tk.Tk()).getName()
-			print(new_name == "")
+			plant_name = PlantNameInput(tk.Tk()).getName()
+			print("new name is: %s"%plant_name)
 			return
 
 		is_data_updated = False
@@ -210,8 +216,8 @@ class Program():
 			state_colors = action_colors[self.action_state.get()]
 		except KeyError as e:
 			print("Could not set colors based on %s"%e)
-		finally:
 			return
+
 
 		new_name_list = self.pot_text[i].get().split("\n")
 		new_name = "\n".join((new_name_list[0], new_name_list[1], todays_date))
@@ -252,6 +258,94 @@ class Program():
 									foreground = state_colors[2], 
 									activeforeground = state_colors[2])
 	
+	def updatePot(self, i):
+		#print("Pot Number is: %s"%(i+1))
+		gh = self.greenhouse_variable.get()
+		tub = self.tub_variable.get()
+		filename =  "GH%01d%s-%s.csv"%(int(gh / 2) + 1, "E" * (gh % 2) + "W" * ((gh +1) % 2), tub + 1)
+		filepath = data_folder + file_separator + filename
+		if filename not in os.listdir(data_folder):
+			print("Cannot update plants that don't exist. Initilize tub by importing from a file.")
+			return
+
+		if self.action_state.get() == "Pot Info":
+			self.renamePot(i, filepath)
+			return
+			
+		is_data_updated = False
+
+		try:
+			state_colors = action_colors[self.action_state.get()]
+		except KeyError as e:
+			print("Could not set colors based on %s"%e)
+			return
+
+
+		new_name_list = self.pot_text[i].get().split("\n")
+		new_name = "\n".join((new_name_list[0], new_name_list[1], todays_date))
+
+		
+		#print("Searching in " + filename)
+
+		header = None
+		new_line_list = []
+		with open(filepath, "r") as ifile:
+			header = ifile.readline()
+			for line in ifile:
+				new_line = line
+
+				if new_name_list[0] in line:
+					# only possbly update the plant with the new line
+					line_list = line.split(",")
+					index = info_list.index(self.action_state.get())
+
+					if line_list[index-1] != "" and line_list[index] == "":
+					#making sure that the update is only going to the next stage, and not skipping stages
+						line_list[index] = todays_date
+						new_line = ",".join(line_list)
+						print(new_line)
+				new_line_list.append(new_line)
+
+		with open(filepath, "w") as file:
+			file.write(header)
+			for line in new_line_list: file.write(line)
+
+
+
+		self.pot_text[i].set(new_name)
+		self.pot_list[i].configure(	background = state_colors[0], 
+									activebackground = state_colors[1], 
+									foreground = state_colors[2], 
+									activeforeground = state_colors[2])
+
+	def renamePot(self, pot_number, filepath):
+		new_plant_name = PlantNameInput(tk.Tk()).getName()
+		if new_plant_name == "":
+			return
+		new_name_list = self.pot_text[pot_number].get().split("\n")
+		new_name = "\n".join((new_plant_name, new_name_list[1], todays_date))
+		self.pot_text[pot_number].set(new_name)
+		current_plant_name = new_name_list[0]
+		#print("Searching in " + filename)
+
+		header = None
+		new_line_list = []
+		with open(filepath, "r") as file:
+			header = file.readline()
+			for line in file:
+				new_line = line
+
+				if new_name_list[0] in line:
+					# only possbly update the plant with the new line
+					line_list = line.split(",")
+					new_line = [new_plant_name] + line_list[1:]
+					new_line = ",".join(new_line)
+				new_line_list.append(new_line)
+
+		with open(filepath, "w") as file:
+			file.write(header)
+			for line in new_line_list: file.write(line)
+
 	def setPot(self, i):
 		#print("Pot Number is: %s"%(i+1))
 		if self.action_state.get() == "Pot Info":
@@ -304,6 +398,10 @@ class Program():
 				name = data_list[0]
 				pot_number = int(data_list[1]) - 1
 				latest_date_index = data_list.index("") - 1
+				if latest_date_index == 1: #no date exists
+					self.pot_text[pot_number].set("%s\nPot %02d\n"%(name, pot_number + 1))
+					continue
+
 				latest_date = data_list[latest_date_index]
 				self.pot_text[pot_number].set("%s\nPot %02d\n%s"%(name, pot_number + 1, latest_date))
 				self.action_state.set(info_list[latest_date_index])
@@ -380,9 +478,10 @@ class Program():
 		ifile.close()
 
 	def updateTubAppends(self, filepath):
+		headline = None
+		temp_line_list = [None]*self.number_of_pots
 		with open(filepath, "r") as file:
 			headline = file.readline()
-			temp_line_list = [None]*self.number_of_pots
 			for line in file:
 				temp_line_list[int(line.split(",")[1]) - 1] = line
 

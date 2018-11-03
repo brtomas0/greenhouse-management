@@ -39,7 +39,7 @@ class ContinueQuestion():
 
 		self.continue_button = tk.Button(self.frame, text = "Continue?", command = self.answerTrue, font = self.button_font, width = 24, height = 6)
 		self.continue_button.pack(side = "left")
-		self.quit_button = tk.Button(self.frame, text = "Quit", fg = "red", command = self.answerFalse, font = self.button_font, width = 24, height = 6)
+		self.quit_button = tk.Button(self.frame, text = "Don't Continue", fg = "red", command = self.answerFalse, font = self.button_font, width = 24, height = 6)
 		self.quit_button.pack(side = "right")
 
 		self.master.wait_window()
@@ -90,7 +90,6 @@ class Program():
 
 		self.buttonInitilize()
 		self.importTub()
-
 
 	def buttonInitilize(self):
 		self.current_state_label = tk.Label(self.frame, textvariable = self.action_state, font = self.label_font)
@@ -304,7 +303,7 @@ class Program():
 
 	def updateTubAppends(self, filename):
 		file = open(filename)
-
+		temp_pot_list = [None]*self.number_of_pots
 		file.close()
 
 def main():

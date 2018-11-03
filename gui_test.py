@@ -66,6 +66,29 @@ class ContinueQuestion():
 	def getAnswer(self):
 		return self.continue_answer
 
+class PlantNameInput():
+	def __init__(self, master):
+		self.master = master
+		self.frame = tk.Frame(master)
+		self.frame.pack()
+		self.new_name = ""
+
+		self.text_label = tk.Label(self.frame, text = "Name:")
+		self.text_label.grid(row = 0, column = 0)
+		self.data_entry = tk.Entry(self.frame)
+		self.data_entry.grid(row = 0, column = 1)
+		self.entry_done = tk.Button(self.frame, text = "Done", command = self.buttonClick)
+		self.entry_done.grid(row = 0, column = 2)
+	
+		self.master.wait_window()
+	
+	def buttonClick(self):
+		self.new_name = self.data_entry.get()
+		self.master.destroy()
+
+	def getName(self):
+		return self.new_name
+
 class Program():
 
 	def __init__(self, master):
@@ -177,6 +200,8 @@ class Program():
 	def updatePot(self, i):
 		#print("Pot Number is: %s"%(i+1))
 		if self.action_state.get() == "Pot Info":
+			new_name = PlantNameInput(tk.Tk()).getName()
+			print(new_name == "")
 			return
 
 		is_data_updated = False

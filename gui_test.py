@@ -132,13 +132,13 @@ class Program():
 		self.importTub()
 
 	def buttonInitilize(self):
-		self.current_state_label = tk.Label(self.frame, textvariable = self.action_state, font = self.label_font)
-		self.current_state_label.grid(row = 0, column = 3)
-		self.current_date_label = tk.Label(self.frame, text = todays_date, font = self.label_font)
-		self.current_date_label.grid(row = 0, column = 4)
-		self.export_button = tk.Button(self.frame, text = "Export", width = self.button_width, height = self.button_height, command = self.exportMaster, font = self.label_font)
-		self.export_button.grid(row = 0, column = 0)
-		self.import_button = tk.Button(self.frame, text = "Import", width = self.button_width, height = self.button_height, command = self.importMaster, font = self.label_font)
+		#self.current_state_label = tk.Label(self.frame, textvariable = self.action_state, font = self.label_font)
+		#self.current_state_label.grid(row = 0, column = 3)
+		#self.current_date_label = tk.Label(self.frame, text = todays_date, font = self.label_font)
+		#self.current_date_label.grid(row = 0, column = 4)
+		#self.export_button = tk.Button(self.frame, text = "Export", width = self.button_width, height = self.button_height, command = self.exportMaster, font = self.label_font)
+		#self.export_button.grid(row = 0, column = 0)
+		self.import_button = tk.Button(self.frame, text = "Import File from:\n%s"%import_filename, width = self.button_width * 2, height = self.button_height, command = self.importMaster, font = self.label_font)
 		self.import_button.grid(row = 1, column = 0)
 
 		start_row = 1
@@ -286,7 +286,7 @@ class Program():
 
 		
 		#print("Searching in " + filename)
-
+		pot_updated = False
 		header = None
 		new_line_list = []
 		with open(filepath, "r") as ifile:
@@ -301,6 +301,7 @@ class Program():
 
 					if line_list[index-1] != "" and line_list[index] == "":
 					#making sure that the update is only going to the next stage, and not skipping stages
+						pot_updated = True
 						line_list[index] = todays_date
 						new_line = ",".join(line_list)
 						print(new_line)
@@ -310,6 +311,8 @@ class Program():
 			file.write(header)
 			for line in new_line_list: file.write(line)
 
+		if not pot_updated:
+			return
 
 
 		self.pot_text[i].set(new_name)
@@ -476,6 +479,8 @@ class Program():
 		# Need to merge the files, overwriting old data with new data
 
 		ifile.close()
+		with open(import_filename, "w") as file:
+			file.write(",".join(first_line) + "\n")
 
 	def updateTubAppends(self, filepath):
 		headline = None

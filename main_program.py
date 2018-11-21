@@ -143,7 +143,7 @@ class Program():
 
 		start_row = 1
 		for i in range(self.number_of_greenhouses):
-			self.greenhouse_list[i] = tk.Radiobutton(self.frame, text = "GH%01d-%s"%(int(i / 2) + 1, "E" * (i % 2) + "W" * ((i+1) % 2) ))
+			self.greenhouse_list[i] = tk.Radiobutton(self.frame, text = "GH%01d-%s"%(int(i / 2) + 1, ["E","W"][i%2] ))
 			self.greenhouse_list[i].configure(	indicatoron = 0,
 												width = self.button_width, 
 												height = self.button_height,

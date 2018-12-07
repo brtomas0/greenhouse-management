@@ -97,8 +97,19 @@ class PlantNameInput():
 class MainWindow():
 
     def __init__(self, master):
+        self.master = master
+        # self.master.title = "Greenhouse Data Manager"
         self.frame = tk.Frame(master)
-        self.frame.pack()
+        self.action_frame = tk.Frame(master)
+        self.greenhouse_frame = tk.Frame(master)
+        self.tub_frame = tk.Frame(master)
+        self.frame.pack(side = "top")
+        self.pot_frame = tk.Frame(master)
+        self.action_frame.pack(side = "left", anchor = "nw")
+        self.greenhouse_frame.pack(side = "top", anchor = "w")
+        self.tub_frame.pack(side = "top", anchor = "nw")
+        self.pot_frame.pack(side = "bottom")
+
 
         self.gh_format = {  "greenhouse count" : 4,
                             "tub-per-greenhouse" : 20,
@@ -123,10 +134,12 @@ class MainWindow():
         
         self.loadTub()
 
-    def makePotButtons(self, start_row, button_style):
+    def makePotButtons(self, start_row):
+        button_style = {"width" : 15, "height" : 3, "font" : font.Font(size = 12)}
+        if self.gh_format["pot-per-tub"] > 60:
+            button_style["width"] = 10
         for i in range(self.gh_format["pot-per-tub"]):
-            # print(i)
-            self.pot_buttons[i] = tk.Button(self.frame, button_style)
+            self.pot_buttons[i] = tk.Button(self.tub_frame, button_style)
             pot = i
             row = (i % self.gh_format["pot rows"] + start_row)
             column = (int( i / self.gh_format["pot rows"] ) + 3)
@@ -143,38 +156,40 @@ class MainWindow():
         # self.save_button.grid(row = 1, column = 0)
 
         self.import_button = tk.Button(self.frame, text = "Import File from:\n%s"%import_filename, width = button_style["width"] * 2, height = button_style["height"], command = self.importMaster, font = button_style["font"])
-        self.import_button.grid(row = 1, column = 0)
+        # self.import_button.grid(row = 1, column = 0)
+        self.import_button.pack(side = "left")
 
-        start_row = 1
+        start_row = 0#1
         for i in range(self.gh_format["greenhouse count"]):
-            self.greenhouse_buttons[i] = tk.Radiobutton(self.frame, button_style)
-            self.greenhouse_buttons[i].configure(  text = self.gh_format["greenhouse names"][i],
-                                                indicatoron = 0,
-                                                variable = self.greenhouse_variable,
-                                                value = i,
-                                                command = self.updateGreenhouse,)
-            self.greenhouse_buttons[i].grid(       row = (int(i / 10) + start_row),
-                                                column = (i % 10 + 3))
+            self.greenhouse_buttons[i] = tk.Radiobutton(self.greenhouse_frame, button_style)
+            self.greenhouse_buttons[i].configure(   text = self.gh_format["greenhouse names"][i],
+                                                    indicatoron = 0,
+                                                    variable = self.greenhouse_variable,
+                                                    value = i,
+                                                    command = self.updateGreenhouse)
+            self.greenhouse_buttons[i].grid(        row = (int(i / 10) + start_row),
+                                                    column = (i % 10 + 3))
 
-        start_row = 2
+        start_row = 0#2
         for i in range(self.gh_format["tub-per-greenhouse"]):
-            self.tub_buttons[i] = tk.Radiobutton(self.frame, button_style)
-            self.tub_buttons[i].configure( text = "Tub %02d"%(i + 1),
-                                        indicatoron = 0,
-                                        variable = self.tub_variable,
-                                        value = i,
-                                        background = "#aaa",
-                                        command = self.updateTub,)
-            self.tub_buttons[i].grid(      row = (int(i / 10) + start_row),
-                                        column = (i % 10 + 3))
+            self.tub_buttons[i] = tk.Radiobutton(self.tub_frame, button_style)
+            self.tub_buttons[i].configure(  text = "Tub %02d"%(i + 1),
+                                            indicatoron = 0,
+                                            variable = self.tub_variable,
+                                            value = i,
+                                            background = "#aaa",
+                                            command = self.updateTub,
+                                            padx = 0)
+            self.tub_buttons[i].grid(       row = (int(i / 10) + start_row),
+                                            column = (i % 10 + 3))
 
-        start_row = start_row + 2
-        self.makePotButtons(start_row, button_style)
+        start_row = 0#start_row + 2
+        self.makePotButtons(0)
 
 
         for i in range(len(actions_in_order)):
             action = actions_in_order[i]
-            self.action_button[i] = tk.Radiobutton(self.frame, text=action)
+            self.action_button[i] = tk.Radiobutton(self.action_frame, text=action)
             self.action_button[i].configure(indicatoron         = 0,
                                             background          = action_colors[action][0], 
                                             activebackground    = action_colors[action][1],

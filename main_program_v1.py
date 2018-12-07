@@ -108,7 +108,7 @@ class MainWindow():
         self.action_frame.pack(side = "left", anchor = "nw")
         self.greenhouse_frame.pack(side = "top", anchor = "w")
         self.tub_frame.pack(side = "top", anchor = "nw")
-        self.pot_frame.pack(side = "bottom")
+        self.pot_frame.pack(side = "top", anchor = "nw", padx = 20, pady = 20)
 
 
         self.gh_format = {  "greenhouse count" : 4,
@@ -133,21 +133,21 @@ class MainWindow():
         self.tub_filepath = data_folder + file_separator + self.tub_filename
         
         self.loadTub()
+        self.makeButtons()
 
-    def makePotButtons(self, start_row):
-        button_style = {"width" : 15, "height" : 3, "font" : font.Font(size = 12)}
+    def makePotButtons(self):
+        button_style = {"width" : 13, "height" : 3, "font" : font.Font(size = 12)}
+        
         if self.gh_format["pot-per-tub"] > 60:
-            button_style["width"] = 10
+            button_style = {"width" : 10, "height" : 3, "font" : font.Font(size = 10)}
+
         for i in range(self.gh_format["pot-per-tub"]):
-            self.pot_buttons[i] = tk.Button(self.tub_frame, button_style)
-            pot = i
-            row = (i % self.gh_format["pot rows"] + start_row)
-            column = (int( i / self.gh_format["pot rows"] ) + 3)
-            self.pot_buttons[i].configure( textvariable = self.pot_text[i],
-                                        # textvariable = "%s,%s,%s"%(pot, row, column),
-                                        command = lambda a=i: self.updatePot(a))
-            self.pot_buttons[i].grid(      row = (i % self.gh_format["pot rows"] + start_row),
-                                        column = (int( i / self.gh_format["pot rows"] ) + 3))
+            self.pot_buttons[i] = tk.Button(self.pot_frame, button_style)
+
+            self.pot_buttons[i].configure(  textvariable    = self.pot_text[i],
+                                            command         = lambda a=i: self.updatePot(a))
+            self.pot_buttons[i].grid(       row             = i % self.gh_format["pot rows"],
+                                            column          = (int( i / self.gh_format["pot rows"] ) + 3))
 
     def makeButtons(self):
         button_style = {"width" : 15, "height" : 3, "font" : font.Font(size = 12)}
@@ -155,38 +155,45 @@ class MainWindow():
         # self.save_button = tk.Button(self.frame, text = "Save", width = button_style["width"] * 2, height = button_style["height"], command = self.saveTub)
         # self.save_button.grid(row = 1, column = 0)
 
-        self.import_button = tk.Button(self.frame, text = "Import File from:\n%s"%import_filename, width = button_style["width"] * 2, height = button_style["height"], command = self.importMaster, font = button_style["font"])
-        # self.import_button.grid(row = 1, column = 0)
-        self.import_button.pack(side = "left")
+        self.import_button = tk.Button( self.action_frame, 
+                                        text    = "Import File from:\n%s"%import_filename, 
+                                        command = self.importMaster,
+                                        width   = 30, 
+                                        height  = 3,  
+                                        font    = font.Font(size = 12))
+        self.import_button.grid()
 
-        start_row = 0#1
+        # Making the Greenhouse Buttons
         for i in range(self.gh_format["greenhouse count"]):
-            self.greenhouse_buttons[i] = tk.Radiobutton(self.greenhouse_frame, button_style)
-            self.greenhouse_buttons[i].configure(   text = self.gh_format["greenhouse names"][i],
+            self.greenhouse_buttons[i] = tk.Radiobutton(self.greenhouse_frame)
+            self.greenhouse_buttons[i].configure(   text        = self.gh_format["greenhouse names"][i],
                                                     indicatoron = 0,
-                                                    variable = self.greenhouse_variable,
-                                                    value = i,
-                                                    command = self.updateGreenhouse)
-            self.greenhouse_buttons[i].grid(        row = (int(i / 10) + start_row),
-                                                    column = (i % 10 + 3))
+                                                    variable    = self.greenhouse_variable,
+                                                    value       = i,
+                                                    command     = self.updateGreenhouse,
+                                                    width       = 30, 
+                                                    height      = 3,  
+                                                    font        = font.Font(size = 12))
+            self.greenhouse_buttons[i].grid(        row         = int(i / 10),
+                                                    column      = (i % 10 + 3))
 
-        start_row = 0#2
+        # Making the Tub buttons
         for i in range(self.gh_format["tub-per-greenhouse"]):
-            self.tub_buttons[i] = tk.Radiobutton(self.tub_frame, button_style)
-            self.tub_buttons[i].configure(  text = "Tub %02d"%(i + 1),
+            self.tub_buttons[i] = tk.Radiobutton(self.tub_frame)
+            self.tub_buttons[i].configure(  text        = "Tub %02d"%(i + 1),
                                             indicatoron = 0,
-                                            variable = self.tub_variable,
-                                            value = i,
-                                            background = "#aaa",
-                                            command = self.updateTub,
-                                            padx = 0)
-            self.tub_buttons[i].grid(       row = (int(i / 10) + start_row),
-                                            column = (i % 10 + 3))
+                                            variable    = self.tub_variable,
+                                            value       = i,
+                                            background  = "#aaa",
+                                            command     = self.updateTub,
+                                            padx        = 0,
+                                            width       = 15, 
+                                            height      = 3,  
+                                            font        = font.Font(size = 12))
+            self.tub_buttons[i].grid(       row         = int(i / 10),
+                                            column      = (i % 10 + 3))
 
-        start_row = 0#start_row + 2
-        self.makePotButtons(0)
-
-
+        # Making the Actio Buttons
         for i in range(len(actions_in_order)):
             action = actions_in_order[i]
             self.action_button[i] = tk.Radiobutton(self.action_frame, text=action)
@@ -195,15 +202,15 @@ class MainWindow():
                                             activebackground    = action_colors[action][1],
                                             selectcolor         = action_colors[action][1], 
                                             foreground          = action_colors[action][2], 
-                                            activeforeground    = action_colors[action][2], 
-                                            width               = button_style["width"] * 2, 
-                                            height              = int(button_style["height"]),
+                                            activeforeground    = action_colors[action][2],
                                             command             = lambda a=action: self.updateAction(a),
                                             variable            = self.action_state,
                                             value               = action,
-                                            font                = button_style["font"])
-            self.action_button[i].grid(     row = (i+2),
-                                            column = 0)
+                                            width               = 25, 
+                                            height              = 3,  
+                                            font                = font.Font(size = 15))
+            self.action_button[i].grid(     row     = (i + 1),
+                                            column  = 0)
 
     def updateGreenhouse(self):
         self.updateTub()
@@ -266,7 +273,7 @@ class MainWindow():
         for i in range(self.gh_format["pot-per-tub"]):
             self.resetPot(i)
 
-    def removeButtons(self):
+    def removePotButtons(self):
         for pot in self.pot_buttons:
             pot.grid_forget()
 
@@ -277,7 +284,7 @@ class MainWindow():
 
         # refresh the window to remove unecessary buttons and resize properly
         try:
-            self.removeButtons()
+            self.removePotButtons()
         except:
             pass
 
@@ -288,11 +295,11 @@ class MainWindow():
         self.pot_buttons =          [None for _ in range(self.gh_format["pot-per-tub"])]
         self.action_button =        [None for _ in range(len(actions_in_order))]
 
-        self.makeButtons()
+        self.makePotButtons()
 
     def loadTub(self):
         if self.tub_filename not in os.listdir(data_folder):
-            self.removeButtons()
+            self.removePotButtons()
             print("%s does not exist in %s"%(self.tub_filename, data_folder))
             return
 

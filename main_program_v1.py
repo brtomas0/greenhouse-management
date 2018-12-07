@@ -136,7 +136,7 @@ class MainWindow():
         self.makeButtons()
 
     def makePotButtons(self):
-        button_style = {"width" : 13, "height" : 3, "font" : font.Font(size = 12)}
+        button_style = {"width" : 14, "height" : 3, "font" : font.Font(size = 12)}
         
         if self.gh_format["pot-per-tub"] > 60:
             button_style = {"width" : 10, "height" : 3, "font" : font.Font(size = 10)}
@@ -158,7 +158,7 @@ class MainWindow():
         self.import_button = tk.Button( self.action_frame, 
                                         text    = "Import File from:\n%s"%import_filename, 
                                         command = self.importMaster,
-                                        width   = 30, 
+                                        width   = 24, 
                                         height  = 3,  
                                         font    = font.Font(size = 12))
         self.import_button.grid()
@@ -206,7 +206,7 @@ class MainWindow():
                                             command             = lambda a=action: self.updateAction(a),
                                             variable            = self.action_state,
                                             value               = action,
-                                            width               = 25, 
+                                            width               = 20, 
                                             height              = 3,  
                                             font                = font.Font(size = 15))
             self.action_button[i].grid(     row     = (i + 1),

@@ -1,0 +1,6 @@
+Future Features:
+    Undo Button
+    Top-down overview of entire greenhouse with dots of color (no text) showing current state of each plant
+    Top-down overview but with time implemented, showing how plants age over time
+    Print Tub
+    menu options

@@ -4,3 +4,5 @@ Future Features:
     Top-down overview but with time implemented, showing how plants age over time
     Print Tub
     menu options
+    fix import to include headers
+    add make new tub button to emtpy tubs

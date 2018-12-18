@@ -94,6 +94,38 @@ class PlantNameInput():
     def getName(self):
         return self.new_name
 
+class NewPotInput():
+    def __init__(self, master):
+        self.master = master
+        self.frame = tk.Frame(master)
+        self.frame.pack()
+        self.data = [None, None, None] # data for (pot-per-tub, pot rows, pot columns)
+        self.data_names = ("pot-per-tub", "pot rows", "pot columns")
+        self.data_entries = [tk.Entry(self.frame) for i in range(3)]
+
+        for i in range(3):
+            self.text_label = tk.Label(self.frame, text = self.data_names[i])
+            self.text_label.grid(row = i, column = 0)
+            self.data_entries[i].grid(row = i, column = 1)
+
+        self.entry_done = tk.Button(self.frame, text = "Done", command = self.buttonClick)
+        self.entry_done.grid(row = 0, column = 2, rowspan = 3)
+
+        self.master.bind("<Return>", self.pressEnter)
+    
+        self.master.wait_window()
+    
+    def buttonClick(self):
+        for i in range(3):
+            self.data[i] = int(self.data_entries[i].get())
+        self.master.destroy()
+
+    def pressEnter(self, event):
+        self.buttonClick()
+
+    def getData(self):
+        return self.data
+
 class MainWindow():
 
     def __init__(self, master):
@@ -158,7 +190,6 @@ class MainWindow():
 
         for i in range(self.gh_format["pot-per-tub"]):
             self.pot_buttons[i] = tk.Button(self.pot_frame, button_style)
-
             self.pot_buttons[i].configure(  textvariable    = self.pot_text[i],
                                             command         = lambda a=i: self.updatePot(a))
             self.pot_buttons[i].grid(       row             = i % self.gh_format["pot rows"],
@@ -177,6 +208,13 @@ class MainWindow():
                                         height  = 3,  
                                         font    = font.Font(size = 12))
         self.import_button.grid()
+
+        self.new_tub_butt = tk.Button(  self.pot_frame,
+                                        text = "Make a new tub",
+                                        command = self.makeNewTub,
+                                        width = 30,
+                                        height = 5,
+                                        font = font.Font(size = 16))
 
         # Making the Greenhouse Buttons
         for i in range(self.gh_format["greenhouse count"]):
@@ -316,7 +354,13 @@ class MainWindow():
         if self.tub_filename not in os.listdir(data_folder):
             self.removePotButtons()
             print("%s does not exist in %s"%(self.tub_filename, data_folder))
+            self.new_tub_butt.grid()
             return
+        else:
+            try: self.new_tub_butt.grid_forget()
+            except: pass
+
+
 
         with open(self.tub_filepath, "r") as ifile:
 
@@ -360,6 +404,11 @@ class MainWindow():
                 ofile.write(",".join(plant) + "\n")
 
         print("Tub Saved")
+
+    def makeNewTub(self):
+        print(NewPotInput(tk.Tk()).getData())
+        print("Making a new tub.......\n")
+        pass
 
     def updateTubAppends(self, filepath):
         pot_info = None

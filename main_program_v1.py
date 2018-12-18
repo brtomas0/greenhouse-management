@@ -104,11 +104,17 @@ class MainWindow():
         self.greenhouse_frame = tk.Frame(master)
         self.tub_frame = tk.Frame(master)
         self.frame.pack(side = "top")
-        self.pot_frame = tk.Frame(master)
+
+        self.top_level_pot_frame = tk.Frame(master)
+        self.pot_canvas = tk.Canvas(self.top_level_pot_frame)
+
+        self.pot_frame = tk.Frame(self.pot_canvas)
         self.action_frame.pack(side = "left", anchor = "nw")
         self.greenhouse_frame.pack(side = "top", anchor = "w")
         self.tub_frame.pack(side = "top", anchor = "nw")
-        self.pot_frame.pack(side = "top", anchor = "nw", padx = 20, pady = 20)
+        self.top_level_pot_frame.pack(side = "top", anchor = "nw", padx = 20, pady = 20)
+        self.pot_canvas.pack()
+        self.pot_frame.pack()
 
 
         self.gh_format = {  "greenhouse count" : 4,
@@ -132,6 +138,15 @@ class MainWindow():
         self.tub_filename = "%s-%s.csv"%(self.gh_format["greenhouse names"][self.greenhouse_variable.get()], self.tub_variable.get() + 1)
         self.tub_filepath = data_folder + file_separator + self.tub_filename
         
+
+        self.scrollbar_frame = tk.Frame(self.top_level_pot_frame)
+        self.scrollbar_frame.pack(side = "bottom", fill = "x")
+        self.x_scrollbar = tk.Scrollbar(self.scrollbar_frame, orient = "horizontal")
+        self.x_scrollbar.pack(fill = "x")
+
+        self.pot_canvas.config(xscrollcommand = self.x_scrollbar.set) # , scrollregion=self.pot_canvas.bbox("all"))
+        self.x_scrollbar.config(command = self.pot_canvas.xview)
+
         self.loadTub()
         self.makeButtons()
 
